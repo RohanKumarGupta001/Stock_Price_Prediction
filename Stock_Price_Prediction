@@ -1,0 +1,83 @@
+#include <iostream>
+#include <vector>
+#include <cmath> // For mathematical operations like pow()
+#include <cstdlib> // For random number generation
+#include <ctime>   // For seeding random numbers
+using namespace std;
+
+// Function to calculate the mean of a vector
+double calculateMean(const vector<double>& data) {
+    double sum = 0.0;
+    for (double value : data) {
+        sum += value;
+    }
+    return sum / data.size();
+}
+
+// Function to calculate the variance of a vector
+double calculateVariance(const vector<double>& data, double mean) {
+    double variance = 0.0;
+    for (double value : data) {
+        variance += pow(value - mean, 2);
+    }
+    return variance / data.size();
+}
+
+// Simulate stock price prediction using simple linear regression
+void predictStockPrices(const vector<double>& historicalPrices) {
+    int n = historicalPrices.size();
+    if (n < 2) {
+        cout << "Not enough data for prediction.\n";
+        return;
+    }
+
+    // Calculate the mean of the indices (x) and prices (y)
+    vector<double> indices(n);
+    for (int i = 0; i < n; ++i) {
+        indices[i] = i;
+    }
+
+    double meanX = calculateMean(indices);
+    double meanY = calculateMean(historicalPrices);
+
+    // Calculate the slope (m) and intercept (b) for y = mx + b
+    double numerator = 0.0, denominator = 0.0;
+    for (int i = 0; i < n; ++i) {
+        numerator += (indices[i] - meanX) * (historicalPrices[i] - meanY);
+        denominator += pow(indices[i] - meanX, 2);
+    }
+    double slope = numerator / denominator;
+    double intercept = meanY - slope * meanX;
+
+    // Predict future prices
+    cout << "Predicted stock prices: \n";
+    for (int i = 0; i < 5; ++i) { // Predict next 5 time periods
+        double futureIndex = n + i;
+        double predictedPrice = slope * futureIndex + intercept;
+        std::cout << "Time " << futureIndex << ": " << predictedPrice << "\n";
+    }
+}
+
+int main() {
+    // Seed random number generator for reproducibility
+    srand(std::time(0));
+
+    // Simulate some historical stock prices
+    vector<double> historicalPrices;
+    for (int i = 0; i < 10; ++i) {
+        historicalPrices.push_back(100 + rand() % 50); // Random prices between 100 and 150
+    }
+
+    // Display historical prices
+    cout << "Historical stock prices: \n";
+    for (size_t i = 0; i < historicalPrices.size(); ++i) {
+        cout << "Time " << i << ": " << historicalPrices[i] << "\n";
+    }
+
+    cout << "\n";
+
+    // Predict future stock prices
+    predictStockPrices(historicalPrices);
+
+    return 0;
+}
